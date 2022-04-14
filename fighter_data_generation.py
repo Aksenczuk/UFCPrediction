@@ -37,4 +37,4 @@ fighter_stat.insert(0, 'ID', np.arange(1,len(fighter_stat.index)+1))
 fighter_stat.reset_index(drop=True, inplace=True)
 
 # export dataset
-fighter_stat.to_csv("datasets/FIGHTER_STAT.csv",index=False)
+fighter_stat.to_csv("datasets/fighter_stats.csv",index=False)

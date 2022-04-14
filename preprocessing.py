@@ -1,6 +1,8 @@
+from cProfile import label
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 import os
 
 SEED = 42
@@ -52,6 +54,11 @@ df = df.dropna()
 missing = round(df.isnull().sum()/df.shape[0]*100,2)
 print(f"\n% Missing in {len(missing[missing > 0])} Features:\n{missing[missing > 0]}")
 
+# label encode fighters stances
+labelmaker = LabelEncoder()
+df["R_Stance"] = labelmaker.fit_transform(df["R_Stance"])
+df["B_Stance"] = labelmaker.fit_transform(df["B_Stance"])
+
 # reorder columns
 B_age = df.pop("B_age")
 df.insert(27, "B_age", B_age)	
@@ -70,14 +77,14 @@ ufc_train = df.drop(test_rows, inplace=False, axis=0) # remove test set from dat
 ufc_train.reset_index(drop=1, inplace=True)
 
 print(f"df shape: {df.shape}")
-print(f"UFC_TEST shape: {ufc_test.shape}")
-print(f"UFC_TRAIN shape: {ufc_train.shape}")
+print(f"ufc_test shape: {ufc_test.shape}")
+print(f"ufc_train shape: {ufc_train.shape}")
 print("----------------------")
 print(df.info())
 print("----------------------")
 df.head()
 
 # export datasets
-df.to_csv("datasets/UFC_processed.csv",index=False)
-ufc_test.to_csv("datasets/UFC_TEST.csv",index=False)
-ufc_train.to_csv("datasets/UFC_TRAIN.csv",index=False) 
+df.to_csv("datasets/ufc_processed.csv",index=False)
+ufc_test.to_csv("datasets/ufc_test.csv",index=False)
+ufc_train.to_csv("datasets/ufc_train.csv",index=False) 
