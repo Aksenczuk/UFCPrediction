@@ -1,16 +1,16 @@
 from asyncio import as_completed
+from matplotlib.pyplot import xkcd
 import sklearn
 import pandas as pd
 import numpy as np
 import os
+import pickle
 from sklearn import metrics
 from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier
-from xgboost import XGBClassifier
 from imblearn.over_sampling import ADASYN # over-sampling
 from sklearn.model_selection import cross_val_score, StratifiedKFold
-
 
 SEED = 42
 WORKERS = 4
@@ -18,41 +18,50 @@ os.environ['PYTHONHASHSEED'] = str(SEED)
 np.random.seed(SEED)
 
 df = pd.read_csv("datasets/ufc_train.csv")
-
 X = df.drop(["date", "Winner", "R_fighter", "B_fighter", "weight_class"], axis=1).values
 y = df["Winner"].values
 
 # over-sampling
 X, y = ADASYN().fit_resample(X, y)
 
-lr_model = LogisticRegression(random_state=SEED, n_jobs=WORKERS, max_iter=5000)
+# model creation
+lr_model = LogisticRegression(random_state=SEED, n_jobs=WORKERS, max_iter=3000)
 lr_model.fit(X,y)
 
 rf_model = RandomForestClassifier(random_state=SEED)
 rf_model.fit(X,y)
 
-ex_model = ExtraTreesClassifier(random_state=SEED)
-ex_model.fit(X,y)
+et_model = ExtraTreesClassifier(random_state=SEED)
+et_model.fit(X,y)
 
 gb_model = GradientBoostingClassifier(random_state=SEED)
 gb_model.fit(X,y)
 
-xgb_model = XGBClassifier(random_state=SEED, use_label_encoder=False, eval_metric='mlogloss')
-xgb_model.fit(X,y)
-
+# model evaluation
 kfold = StratifiedKFold( n_splits=10 )
+modelNames = ["Logistic Regression", "Random Forest", "Extra Trees", "Gradient Boosting"]
+models = [lr_model, rf_model, et_model, gb_model]
 
-lr_modelScore = cross_val_score(lr_model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
-print(f"Logistic Regression K-Fold val-avg-Accuracy: {lr_modelScore}")
+def evaluate_model(model, x):
+    modelScore = cross_val_score(model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
+    print(f"{modelNames[x]} K-Fold val-avg-Accuracy: {modelScore}")
 
-rf_modelScore = cross_val_score(rf_model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
-print(f"Random Forest K-Fold val-avg-Accuracy: {rf_modelScore}")
+for x in range (4):
+    evaluate_model(models[x], x)
 
-ex_modelScore = cross_val_score(ex_model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
-print(f"Extra Trees K-Fold val-avg-Accuracy: {ex_modelScore}")
+# voting ensemble creation
+ensemble = VotingClassifier(estimators = [("Logistic Regression", lr_model), ("Random Forest", rf_model), 
+("Extra Trees", et_model), ("Gradient Boosting", gb_model)], voting="soft", n_jobs=WORKERS)
+ensemble.fit(X,y)
+print(f"{len([x[0] for x in ensemble.estimators])} Models in Ensemble: {[x[0] for x in ensemble.estimators]}")
 
-gb_modelScore = cross_val_score(gb_model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
-print(f"Gradient Boosting K-Fold val-avg-Accuracy: {gb_modelScore}")
+# ensemble evaluation
+test_data = pd.read_csv("datasets/ufc_test.csv")
+X_test = df.drop(["date", "Winner", "R_fighter", "B_fighter", "weight_class"], axis=1).values
+y_test = df["Winner"].values
 
-xgb_modelScore = cross_val_score(xgb_model, X=X, y = y, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
-print(f"XBG K-Fold val-avg-Accuracy: {xgb_modelScore}")
+modelScore = cross_val_score(ensemble, X=X_test, y = y_test, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()
+print(f"Ensemble K-Fold val-avg-Accuracy: {modelScore}")
+
+# pickle dump
+pickle.dump(ensemble, open('resources/ensemble_method.sav', 'wb'))
