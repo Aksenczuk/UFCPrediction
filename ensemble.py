@@ -1,6 +1,3 @@
-from asyncio import as_completed
-from matplotlib.pyplot import xkcd
-import sklearn
 import pandas as pd
 import numpy as np
 import os
@@ -9,7 +6,7 @@ from sklearn import metrics
 from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier
-from imblearn.over_sampling import ADASYN # over-sampling
+from imblearn.over_sampling import ADASYN
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 SEED = 42
@@ -18,7 +15,7 @@ os.environ['PYTHONHASHSEED'] = str(SEED)
 np.random.seed(SEED)
 
 df = pd.read_csv("datasets/ufc_train.csv")
-X = df.drop(["date", "Winner", "R_fighter", "B_fighter", "weight_class"], axis=1).values
+X = df.drop(["date", "Winner", "R_fighter", "B_fighter"], axis=1).values
 y = df["Winner"].values
 
 # over-sampling
@@ -57,7 +54,7 @@ print(f"{len([x[0] for x in ensemble.estimators])} Models in Ensemble: {[x[0] fo
 
 # ensemble evaluation
 test_data = pd.read_csv("datasets/ufc_test.csv")
-X_test = df.drop(["date", "Winner", "R_fighter", "B_fighter", "weight_class"], axis=1).values
+X_test = df.drop(["date", "Winner", "R_fighter", "B_fighter"], axis=1).values
 y_test = df["Winner"].values
 
 modelScore = cross_val_score(ensemble, X=X_test, y = y_test, scoring = "accuracy", cv = kfold, n_jobs=WORKERS).mean()

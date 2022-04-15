@@ -11,7 +11,6 @@ np.random.seed(SEED)
 pd.set_option("display.max_columns", 500)
 pd.set_option("display.max_rows", 50)
 
-
 df = pd.read_csv("datasets/ufc-master.csv")
 print(df.shape)
 
@@ -27,12 +26,13 @@ df = df[df.columns.drop(list(df.filter(regex="location")))]
 df = df[df.columns.drop(list(df.filter(regex="title_bout")))]
 df = df[df.columns.drop(list(df.filter(regex="gender")))]
 df = df[df.columns.drop(list(df.filter(regex="country")))]
-df = df[df.columns.drop(list(df.filter(regex="no_of_rounds")))]					
+df = df[df.columns.drop(list(df.filter(regex="no_of_rounds")))]	
+df = df[df.columns.drop(list(df.filter(regex="weight_class")))]				
 
 df["date"] = pd.to_datetime(df["date"]) # date to datetime
 
-df = df.replace(r'^\s*$', np.nan, regex=True) # replace empty strings with nan
-df = df.fillna(np.nan) # fill empty and nans with nan
+df = df.replace(r'^\s*$', np.nan, regex=True) # replace empty strings with NaN
+df = df.fillna(np.nan) # fill empty and Na with NaN
 
 dateColumn = df.pop('date')
 df.insert(0, 'date', dateColumn)
@@ -61,27 +61,27 @@ df["B_Stance"] = labelmaker.fit_transform(df["B_Stance"])
 
 # reorder columns
 B_age = df.pop("B_age")
-df.insert(27, "B_age", B_age)	
+df.insert(26, "B_age", B_age)	
 
 df["Winner"] = df["Winner"].replace(["Red", "Blue"], [0,1]).values # 0 = Red Winner | 1 = Blue Winner
 
 # shuffle data
 df = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
-# separate 5% as test set
+# split 5% from data as test set
 test_rows = np.arange(0,0.05*len(df.index))
 ufc_test = df.iloc[test_rows].reset_index(drop=True)
 
-# remaining as training set for models
+# other 95% will be training set for models
 ufc_train = df.drop(test_rows, inplace=False, axis=0) # remove test set from dataset
 ufc_train.reset_index(drop=1, inplace=True)
 
 print(f"df shape: {df.shape}")
 print(f"ufc_test shape: {ufc_test.shape}")
 print(f"ufc_train shape: {ufc_train.shape}")
-print("----------------------")
+print("--------------------------------")
 print(df.info())
-print("----------------------")
+print("--------------------------------")
 df.head()
 
 # export datasets
