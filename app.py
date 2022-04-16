@@ -58,7 +58,7 @@ def weight_switch(weight_class):
         return 0, 115
 
 def prediction(sample):
-    prediction = ensemble.predict(sample)
+    prediction = ensemble.predict_proba(sample)
     return prediction
 
 def createMatch(R, B):
@@ -133,8 +133,26 @@ def main():
 
             sample = createMatch(r_id, b_id)
             winner = prediction(sample).tolist()[0]
+            winner_message = f"{r_fighter} has {round(winner[0],2)}% & {b_fighter} has {round(winner[1],2)}% chances to win"
+            
+            st.success(winner_message)
 
-            st.success(match_fighters[winner] + " is the winner")
+    st.write(" ")
+    st.write(" ")
+
+    # pseudo footer
+    st.markdown('''
+        <h3 style='text-align: center; color: white;'>View upcoming UFC events <a href="https://www.ufc.com/events">here</a></h3>
+    ''', unsafe_allow_html=True)
+
+# hide top part
+#MainMenu {visibility: hidden;}
+hide_footer = """
+<style>
+footer {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_footer, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
