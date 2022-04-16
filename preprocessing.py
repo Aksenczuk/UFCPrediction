@@ -24,7 +24,6 @@ df = df[df.columns.drop(list(df.filter(regex="constant_1")))]
 df = df[df.columns.drop(list(df.filter(regex="empty_arena")))]
 df = df[df.columns.drop(list(df.filter(regex="location")))]
 df = df[df.columns.drop(list(df.filter(regex="title_bout")))]
-df = df[df.columns.drop(list(df.filter(regex="gender")))]
 df = df[df.columns.drop(list(df.filter(regex="country")))]
 df = df[df.columns.drop(list(df.filter(regex="no_of_rounds")))]	
 df = df[df.columns.drop(list(df.filter(regex="weight_class")))]				
@@ -34,6 +33,7 @@ df["date"] = pd.to_datetime(df["date"]) # date to datetime
 df = df.replace(r'^\s*$', np.nan, regex=True) # replace empty strings with NaN
 df = df.fillna(np.nan) # fill empty and Na with NaN
 
+# make date first column
 dateColumn = df.pop('date')
 df.insert(0, 'date', dateColumn)
 
@@ -61,7 +61,7 @@ df["B_Stance"] = labelmaker.fit_transform(df["B_Stance"])
 
 # reorder columns
 B_age = df.pop("B_age")
-df.insert(26, "B_age", B_age)	
+df.insert(27, "B_age", B_age)	
 
 df["Winner"] = df["Winner"].replace(["Red", "Blue"], [0,1]).values # 0 = Red Winner | 1 = Blue Winner
 
@@ -79,10 +79,14 @@ ufc_train.reset_index(drop=1, inplace=True)
 print(f"df shape: {df.shape}")
 print(f"ufc_test shape: {ufc_test.shape}")
 print(f"ufc_train shape: {ufc_train.shape}")
-print("--------------------------------")
+print("********************************")
 print(df.info())
-print("--------------------------------")
+print("********************************")
 df.head()
+
+# drop gender for train and test dataset
+ufc_test = ufc_test[ufc_test.columns.drop(list(ufc_test.filter(regex="gender")))]
+ufc_train = ufc_train[ufc_train.columns.drop(list(ufc_train.filter(regex="gender")))]
 
 # export datasets
 df.to_csv("datasets/ufc_processed.csv",index=False)

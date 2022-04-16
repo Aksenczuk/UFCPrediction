@@ -28,6 +28,7 @@ st.markdown('''
 st.markdown('#')
 
 df = pd.read_csv("datasets/fighter_stats.csv")
+fighter_gender = pd.read_csv("datasets/fighter_gender.csv")
 ensemble = pickle.load(open("resources/ensemble_method.sav", 'rb'))
 
 def weight_switch(weight_class):
@@ -77,8 +78,20 @@ def main():
     st.text("")
     weight_class = st.selectbox("Weight Class", ('Heavyweight', 'Light Heavyweight', 'Middleweight', 'Welterweight', 'Lightweight', 'Featherweight', 'Bantamweight', 'Flyweight', "Women's Featherweight", "Women's Bantamweight", "Women's Flyweight", "Women's Strawweight"))
     st.text("")
+
+    # weight_class filter
     min_weight, max_weight = weight_switch(weight_class)
     fighters = df.query(f"Weight_lbs > {min_weight} & Weight_lbs <= {max_weight}")[["fighter"]]
+
+    # gender filter
+    for fighter in fighters["fighter"]:
+        gender = str(fighter_gender.query(f'fighter == "{fighter}"')[["gender"]].iloc[0])
+        if "Women" in weight_class:
+            if "FEMALE" not in gender:
+                fighters.drop(fighters.loc[fighters["fighter"] == fighter].index, inplace=True)
+        else:
+            if "FEMALE" in gender:
+                fighters.drop(fighters.loc[fighters["fighter"] == fighter].index, inplace=True)
 
     col1, col2 = st.columns(2)
     with col1:
