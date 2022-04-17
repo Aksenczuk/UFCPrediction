@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 import pickle
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 # style CSS
 st.markdown('''
@@ -74,6 +76,59 @@ def createMatch(R, B):
     fight = pd.concat([rFighter,bFighter],axis=1).values
     return (fight)
 
+def tale_of_the_tape(R, B):
+    r_wins = int(df.query(f'fighter == "{R}"')[["wins"]].iloc[0])
+    b_wins = int(df.query(f'fighter == "{B}"')[["wins"]].iloc[0])
+    r_losses = int(df.query(f'fighter == "{R}"')[["losses"]].iloc[0])
+    b_losses = int(df.query(f'fighter == "{B}"')[["losses"]].iloc[0])
+    r_height = round(float(df.query(f'fighter == "{R}"')[["Height_cms"]].iloc[0]), 2)
+    b_height = round(float(df.query(f'fighter == "{B}"')[["Height_cms"]].iloc[0]), 2)
+    r_reach = float(df.query(f'fighter == "{R}"')[["Reach_cms"]].iloc[0])
+    b_reach = float(df.query(f'fighter == "{B}"')[["Reach_cms"]].iloc[0])
+    r_weight = float(df.query(f'fighter == "{R}"')[["Weight_lbs"]].iloc[0])
+    b_weight = float(df.query(f'fighter == "{B}"')[["Weight_lbs"]].iloc[0])
+    r_age = int(df.query(f'fighter == "{R}"')[["age"]].iloc[0])
+    b_age = int(df.query(f'fighter == "{B}"')[["age"]].iloc[0])
+
+    new_data = {f"{r_wins}": [r_losses, r_height, r_reach, r_weight, r_age], 
+    "Wins": ["Losses", "Height (cm)", "Reach (cm)", "Weight (lbs)", "Age"],
+    f"{b_wins}": [b_losses, b_height, b_reach, b_weight, b_age]}
+
+    taleOfTheTapeDF = pd.DataFrame(new_data)
+
+    st.markdown('''<style> 
+    tbody th {display:none}
+    .blank {display:none}
+    tbody td,th,table {background: black; color: white; text-align: center;}
+    plotly.figure(")
+    </style>''', unsafe_allow_html=True)
+    #st.table(taleOfTheTapeDF)
+
+    # fig = go.Figure(data=[go.Table(
+    #     header=dict(values=list(taleOfTheTapeDF.columns),
+    #                 fill_color='black',
+    #                 align='center',
+    #                 font_size=15,
+    #                 height=40),
+    #     cells=dict(values=[taleOfTheTapeDF.iloc[:,0], taleOfTheTapeDF.Wins, taleOfTheTapeDF.iloc[:,-1]],
+    #                fill_color='black',
+    #                align='center',
+    #                font_size=15,
+    #                height=40))],)
+
+    # st.plotly_chart(fig)
+    fig, ax = plt.subplots()
+
+    # hide axes
+    fig.patch.set_visible(False)
+    ax.axis('off')
+    ax.axis('tight')
+
+    ax.table(cellText=taleOfTheTapeDF.values, colLabels=taleOfTheTapeDF.columns, loc='center', cellLoc="center")
+
+    fig.tight_layout()
+    st.pyplot(fig)
+
 def main():
     st.text("")
     weight_class = st.selectbox("Weight Class", ('Heavyweight', 'Light Heavyweight', 'Middleweight', 'Welterweight', 'Lightweight', 'Featherweight', 'Bantamweight', 'Flyweight', "Women's Featherweight", "Women's Bantamweight", "Women's Flyweight", "Women's Strawweight"))
@@ -105,7 +160,8 @@ def main():
         img = Image.open('img/fighter_right_new.png')
         st.image(img, use_column_width=True)
 
-    st.text("")
+    if r_fighter != b_fighter:
+        tale_of_the_tape(r_fighter, b_fighter)
 
     col1,col2,col3=st.columns([0.2,1.8,0.2])
     with col1:
@@ -123,11 +179,6 @@ def main():
             st.error("Please select 2 different fighters")
         
         else:
-            match_fighters = {
-                0:str(r_fighter),
-                1:str(b_fighter)
-            }
-
             r_id = df["ID"][df["fighter"]==r_fighter].values[0]
             b_id = df["ID"][df["fighter"]==b_fighter].values[0]
 
