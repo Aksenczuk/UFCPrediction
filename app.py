@@ -195,10 +195,9 @@ def main():
         <h3 style='text-align: center; color: white;'>View upcoming UFC events <a href="https://www.ufc.com/events">here</a></h3>
     ''', unsafe_allow_html=True)
 
-# hide top part
-#MainMenu {visibility: hidden;}
 hide_footer = """
 <style>
+#MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 </style>
 """
