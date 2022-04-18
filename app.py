@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 import pickle
-import plotly.graph_objects as go
+#import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
 # style CSS
