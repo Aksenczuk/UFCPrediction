@@ -1,0 +1,9 @@
+streamlit
+pandas
+numpy
+PIL
+pickle
+matplotlib
+sklearn
+ibmlearn
+os
