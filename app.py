@@ -1,5 +1,5 @@
 import streamlit as st
-import utility as util
+import resources.utility as util
 from views import home, stats
 
 util.injectCustomCSS()
