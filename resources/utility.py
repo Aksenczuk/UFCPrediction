@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit.components.v1 import html
-from paths import NAVIGATION
+from resources.paths import NAVIGATION
 
 def injectCustomCSS():
     with open('resources/style.css') as f:
