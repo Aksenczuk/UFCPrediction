@@ -30,7 +30,7 @@ st.markdown('#')
 
 df = pd.read_csv("datasets/fighter_stats.csv")
 fighter_gender = pd.read_csv("datasets/fighter_gender.csv")
-ensemble = pickle.load(open("resources/ensemble_method.sav", 'rb'))
+ensemble = pickle.load(open("resources/ensemble_model.pickle", 'rb'))
 
 def weight_switch(weight_class):
     if weight_class == 'Heavyweight':
@@ -76,6 +76,7 @@ def createMatch(R, B):
     return (fight)
 
 def tale_of_the_tape(R, B):
+    # values for tale of the tape
     r_wins = int(df.query(f'fighter == "{R}"')[["wins"]].iloc[0])
     b_wins = int(df.query(f'fighter == "{B}"')[["wins"]].iloc[0])
     r_losses = int(df.query(f'fighter == "{R}"')[["losses"]].iloc[0])
@@ -89,10 +90,10 @@ def tale_of_the_tape(R, B):
     r_age = int(df.query(f'fighter == "{R}"')[["age"]].iloc[0])
     b_age = int(df.query(f'fighter == "{B}"')[["age"]].iloc[0])
 
+    # df creation
     new_data = {f"{r_wins}": [r_losses, r_height, r_reach, r_weight, r_age], 
     "Wins": ["Losses", "Height (cm)", "Reach (cm)", "Weight (lbs)", "Age"],
     f"{b_wins}": [b_losses, b_height, b_reach, b_weight, b_age]}
-
     taleOfTheTapeDF = pd.DataFrame(new_data)
 
     st.markdown('''<style> 
@@ -130,7 +131,9 @@ def tale_of_the_tape(R, B):
 
 def main():
     st.text("")
-    weight_class = st.selectbox("Weight Class", ('Heavyweight', 'Light Heavyweight', 'Middleweight', 'Welterweight', 'Lightweight', 'Featherweight', 'Bantamweight', 'Flyweight', "Women's Featherweight", "Women's Bantamweight", "Women's Flyweight", "Women's Strawweight"))
+    weight_class = st.selectbox("Weight Class", ('Heavyweight', 'Light Heavyweight', 'Middleweight', 'Welterweight', 
+    'Lightweight', 'Featherweight', 'Bantamweight', 'Flyweight', "Women's Featherweight", "Women's Bantamweight", 
+    "Women's Flyweight", "Women's Strawweight"))
     st.text("")
 
     # weight_class filter
@@ -181,10 +184,12 @@ def main():
             r_id = df["ID"][df["fighter"]==r_fighter].values[0]
             b_id = df["ID"][df["fighter"]==b_fighter].values[0]
 
-            sample = createMatch(r_id, b_id)
-            winner = prediction(sample).tolist()[0]
-            winner_message = f"{r_fighter} has {round(winner[0],2)}% & {b_fighter} has {round(winner[1],2)}% chances to win"
-            
+            fight = createMatch(r_id, b_id)
+            winner = prediction(fight).tolist()[0]
+            r_proba = round(winner[0],2) * 100
+            b_proba = round(winner[1],2) * 100
+            winner_message = f"{r_fighter} has {r_proba}% & {b_fighter} has {b_proba}% chances to win"
+
             st.success(winner_message)
 
     st.write(" ")
