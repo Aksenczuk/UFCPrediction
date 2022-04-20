@@ -60,4 +60,4 @@ modelScore = cross_val_score(ensemble, X=X_test, y = y_test, scoring = "accuracy
 print(f"Ensemble K-Fold val-avg-Accuracy: {modelScore}")
 
 # pickle dump
-pickle.dump(ensemble, open('resources/ensemble_method.sav', 'wb'))
+pickle.dump(ensemble, open('resources/ensemble_model.pickle', 'wb'))

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 pd.set_option('display.max_columns', 100)
 
-df = pd.read_csv("datasets/UFC_processed.csv")
+df = pd.read_csv("datasets/ufc_processed.csv")
 
 df["date"] = pd.to_datetime(df["date"])
 df = df.drop(columns = "Winner")
