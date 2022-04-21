@@ -89,11 +89,13 @@ def tale_of_the_tape(R, B):
     tbody td,th,table {background: black; color: white; text-align: center;}
     </style>''', unsafe_allow_html=True)
 
-    fig, ax = plt.subplots() 
+    fig, ax = plt.subplots()
+     
     # hide axes
     fig.patch.set_visible(False)
     ax.axis('off')
     ax.axis('tight') 
+
     ax.table(cellText=taleOfTheTapeDF.values, colLabels=taleOfTheTapeDF.columns, loc='center', cellLoc="center") 
     fig.tight_layout()
     st.pyplot(fig)

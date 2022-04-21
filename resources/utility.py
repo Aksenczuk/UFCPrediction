@@ -35,20 +35,5 @@ def navigationbarComponent():
         
         for (var i = 0; i < navigationTabs.length; i++) {
             cleanNavbar(navigationTabs[i]);}
-        
-        var dropdown = window.parent.document.getElementById("settingsDropDown");
-        dropdown.onclick = function() {
-            var dropWindow = window.parent.document.getElementById("myDropdown");
-            if (dropWindow.style.visibility == "hidden"){
-                dropWindow.style.visibility = "visible";}
-                else{
-                dropWindow.style.visibility = "hidden"; } };
-        
-        var settingsNavs = window.parent.document.getElementsByClassName("settingsNav");
-        var cleanSettings = function(navigation_element) {
-            navigation_element.removeAttribute('target')}
-        
-        for (var i = 0; i < settingsNavs.length; i++) {
-            cleanSettings(settingsNavs[i]);}
     </script>'''
     html(js)

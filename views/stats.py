@@ -18,6 +18,9 @@ def load_view():
     main()
 
 def createStatistics(colNames, colValues):
+    for x in range(len(colNames)):
+        colNames[x] = colNames[x].replace("_", " ").capitalize()
+
     newData = {colNames[0]: [colNames[1],colNames[2],colNames[3],colNames[4],colNames[5],
     colNames[6],colNames[7],colNames[8],colNames[9],colNames[10],colNames[11],colNames[12],colNames[13],
     colNames[14],colNames[15],colNames[16],colNames[17],colNames[18],colNames[19],colNames[20],colNames[21],
@@ -25,7 +28,6 @@ def createStatistics(colNames, colValues):
     colValues[6],colValues[7],colValues[8],colValues[9],colValues[10],colValues[11],colValues[12],colValues[13],
     colValues[14],colValues[15],colValues[16],colValues[17],colValues[18],colValues[19],colValues[20],colValues[21],
     colValues[22],colValues[23]]}
-
     newDF = pd.DataFrame(newData)
     st.markdown('''<style> 
     tbody th {display:none}
@@ -41,10 +43,21 @@ def createStatistics(colNames, colValues):
     fig.tight_layout()
     st.pyplot(fig)
 
+def updateStance(stance):
+    if stance == 1:
+        return "Orthodox"
+    elif stance == 2:
+        return "Southpaw"
+    elif stance == 3:
+        return "Swtich"
+    else:
+        return "N/A"
+
 def main():
     fighter = st.selectbox("Fighter", df["fighter"])
     fighterData = df.query(f"fighter == '{fighter}'")
 
     colNames = fighterData.columns.tolist()[2:]
     colValues = fighterData.values[0].tolist()[2:]
+    colValues[19] = updateStance(colValues[19])
     createStatistics(colNames, colValues)
